@@ -1,0 +1,31 @@
+///////PSEUDOCODE//////
+
+//VAO = vertex array object
+// VAO is a way to save the state of the attributes
+// Thiws is how can we visualize it 
+
+var VAO ={
+    "elementArrayBuffer": index_buf,
+    "attributes":[
+        position_buf,  //Index 0 -- Points to a vertex buffer Object (VBO)
+        normal_buf,    //Index 1  -- Where are the vertex pointed
+        uv_buf,        //Index 2   -- uv values for vertex
+        null,          //Index 3
+        null,          //Index 4
+        null           //Index 5
+    ]
+}
+
+// In Render Loop you only need to set the VAO
+
+Shader.attributeState = VAO;
+
+var loc = -1;
+
+
+// setup attribute 0
+loc = Shader.getAttribLoc("position"); Shader.activateAttribu(loc);Shader.pointBuffer(loc, position_buf)
+// setup attribute 1
+loc = Shader.getAttribLoc("normal");Shader.activateAttribu(loc);Shader.pointBuffer(loc, normal_buf)
+
+

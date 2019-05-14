@@ -1,0 +1,31 @@
+//::::::::::::::: WEBGL 1.0 VERTEX SHADER ::::::::::
+
+attribute vec3 a_position;
+uniform mediump float uPointSize;
+uniform float uAngle;
+varying vec3 size;
+
+void main(void){
+
+    gl_PointSize = uPointSize;
+    size = uPointsize;
+
+    gl_Position = vec4(
+        cos(uAngle)*0.8 + a_position.x,
+        sin(uAngle)*0.8 + a_position.y,
+        a_position.z, 1.0);
+    )
+}
+
+//::::::::::::::: WEBGL 1.0 FRAGMENT SHADER ::::::::::
+
+
+precision mediump float;
+
+uniform float uPointSize;
+varying vec3 size;
+
+void main(void){
+    float c = (40.0 - uPointSize)/20.0;
+    gl_FragColor =vec4(c,c,c,1.0);
+}

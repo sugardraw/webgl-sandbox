@@ -1,10 +1,10 @@
 const canvas = document.querySelector('canvas');
 
 
-canvas.style.width = window.innerWidth + "px";
-canvas.style.height = window.innerHeight + "px";
-// canvas.style.width = 500 + "px";
-// canvas.style.height = 500 + "px";
+// canvas.style.width = window.innerWidth + "px";
+// canvas.style.height = window.innerHeight + "px";
+canvas.style.width = 500 + "px";
+canvas.style.height = 500 + "px";
 
 const gl = canvas.getContext('webgl');
 
@@ -17,34 +17,71 @@ if (!gl) {
 }
 
 
-
-
-
-// -vertexData =[...];
-// -create Buffer
-//bind buffer
-// -load vertexData into that Buffer
-// -create vertex shader    
-// -create fragment shader
-// -create programm
-// -attach shaders to program
-// link program
-// -enable vertex attributes
-// -draw
-
 const vertexData = [
-    0, 1, 0,
-    1, -1, 0,
-    -1, -1, 0,
-    -1, 1, 0
+    0.5, 0.5, 0.5,
+    0.5, -0.5, 0.5,
+    -0.5, 0.5, 0.5,
+    -0.5, 0.5, 0.5,
+    0.5, -0.5, 0.5,
+    -0.5, -0.5, 0.5,
+
+    -.5, 0.5, 0.5,
+    -.5, -.5, 0.5,
+    -.5, 0.5, -.5,
+    -.5, 0.5, -.5,
+    -.5, -.5, 0.5,
+    -.5, -.5, -.5,
+
+    -.5, 0.5, -.5,
+    -.5, -.5, -.5,
+    0.5, 0.5, -.5,
+    0.5, 0.5, -.5,
+    -.5, -.5, -.5,
+    0.5, -.5, -.5,
+
+
+    0.5, 0.5, -.5,
+    0.5, -.5, -.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, -.5, 0.5,
+    0.5, -.5, -.5,
+
+    0.5, 0.5, 0.5,
+    0.5, 0.5, -.5,
+    -.5, 0.5, 0.5,
+    -.5, 0.5, 0.5,
+    0.5, 0.5, -.5,
+    -.5, 0.5, -.5,
+
+    0.5, -.5, 0.5,
+    0.5, -.5, -.5,
+    -.5, -.5, 0.5,
+    -.5, -.5, 0.5,
+    0.5, -.5, -.5,
+    -.5, -.5, -.5,
+
+
 ];
 
-const colorData = [
-    1, 0, 0,
-    0, 1, 0,
-    0, 0, 1,
-    1, 1, 1,
-]
+function randomColor() {
+    return [Math.random(), Math.random(), Math.random()]
+}
+
+// let colorData = [
+//     ...randomColor(),
+//     ...randomColor(),
+//     ...randomColor(),
+// ]
+
+let colorData = [];
+
+for (let face = 0; face < 6; face++) {
+    let faceColor = randomColor();
+    for (let vertex = 0; vertex < 6; vertex++) {
+        colorData.push(...faceColor);
+    }
+}
 
 const positionBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -100,6 +137,7 @@ gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
 
 gl.useProgram(program);
+gl.enable(gl.DEPTH_TEST);
 
 const uniformLocations = {
     matrix: gl.getUniformLocation(program, 'matrix')
@@ -107,13 +145,14 @@ const uniformLocations = {
 
 const matrix = glMatrix.mat4.create();
 //translate scale and rotate will occours reverse
-glMatrix.mat4.translate(matrix, matrix, [0.3, -0.6, 0.1]);
-glMatrix.mat4.scale(matrix, matrix, [0.5, 0.5, 0.5]);
-function animate(){
-    glMatrix.mat4.rotateZ(matrix, matrix, (Math.PI/2)/70);
+glMatrix.mat4.translate(matrix, matrix, [0.0, 0.2, 0.1]);
+glMatrix.mat4.scale(matrix, matrix, [0.7, 0.7, 0.7]);
+function animate() {
+    glMatrix.mat4.rotateZ(matrix, matrix, (Math.PI / 2) / 70);
+    glMatrix.mat4.rotateX(matrix, matrix, (Math.PI / 2) / 70);
     gl.uniformMatrix4fv(uniformLocations.matrix, false, matrix);
     // draw arrays
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+    gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 3);
     requestAnimationFrame(animate)
 }
 animate();

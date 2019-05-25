@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./ShaderUtil.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <title>review 1,2,3 lessons</title>
+
+    <script>
+        window.addEventListener("load", () => {
+            const canvas = document.createElement('canvas');
+            document.querySelector('body').appendChild(canvas);
+
+            canvas.style.width = window.innerWidth + "px";
+            canvas.style.height = window.innerHeight + "px";
+            const gl = canvas.getContext('webgl2');
+            gl.clearColor(.0, .0, .0, 1.0);
+            var vShaderTxt = ShaderUtil.domShaderSrc("vertex_shader"),
+                fShaderTxt = ShaderUtil.domShaderSrc("fragment_shader"),
+                // 2. Compile text and validate
+                vShader = ShaderUtil.createShader(gl, vShaderTxt, gl.VERTEX_SHADER),
+                fShader = ShaderUtil.createShader(gl, fShaderTxt, gl.FRAGMENT_SHADER),
+                // 3. Link the shaders together as a program.
+                shaderProg = ShaderUtil.createProgram(gl, vShader, fShader, true);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            var vertices = [
+                -0.7, -0.1, 0,
+                -0.3, 0.6, 0,
+                -0.3, -0.3, 0,
+                0.2, 0.6, 0,
+                0.3, -0.3, 0,
+                0.7, 0.6, 0
+            ]
+            // Create an empty buffer object
+            var vertex_buffer = gl.createBuffer();
+            // Bind appropriate array buffer to it
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+            // Pass the vertex data to the buffer
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+            // Unbind the buffer
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.useProgram(shaderProg);
+            uPointSizeLoc = gl.getUniformLocation(shaderProg, "uPointSize");
+            gl.uniform1f(uPointSizeLoc, 50.0);		//Store data to the shader's uniform variable uPointSize
+            gl.drawArrays(gl.POINTS, 0, 1);//Draw the points
+
+        })
+    </script>
+</head>
+
+<body>
+    <script id="vertex_shader" type="x-shader/x-vertex">#version 300 es
+		in vec3 a_position;
+        uniform float uPointSize;
+        uniform float uAngle;
+		void main(void){
+            gl_PointSize = uPointSize;
+            //gl_Position =vec4(a_position, 1.0);
+			gl_Position = vec4(cos(uAngle)*0.3+a_position.x,sin(uAngle)*0.3+a_position.y,a_position.z,1.0);
+		}
+	</script>
+
+    <script id="fragment_shader" type="x-shader/x-fragment">#version 300 es
+		precision mediump float;
+		out vec4 finalColor;
+		void main(void) {
+			finalColor = vec4(0.4, 0.3, 0.0, 1.0);
+		}
+	</script>
+</body>
+
+</html>

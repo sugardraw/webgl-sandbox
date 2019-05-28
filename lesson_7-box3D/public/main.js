@@ -3,8 +3,8 @@ const canvas = document.querySelector('canvas');
 
 // canvas.style.width = window.innerWidth + "px";
 // canvas.style.height = window.innerHeight + "px";
-canvas.style.width = 500 + "px";
-canvas.style.height = 500 + "px";
+// canvas.style.width = 500 + "px";
+// canvas.style.height = 500 + "px";
 
 const gl = canvas.getContext('webgl');
 
@@ -143,17 +143,44 @@ const uniformLocations = {
     matrix: gl.getUniformLocation(program, 'matrix')
 }
 
-const matrix = glMatrix.mat4.create();
+const modelMatrix = glMatrix.mat4.create();
+const viewMatrix = glMatrix.mat4.create(); // matrix to simulate a camera
+const projectionMatrix = glMatrix.mat4.create();
+
+glMatrix.mat4.perspective(projectionMatrix,
+    75 * Math.PI / 180,//vertical field-of-view (angle in rad)
+    canvas.width / canvas.height, //aspect W/H
+    1e-4, // near cull distance (0.00001)
+    1e4 // far cull distance
+
+)
+
+const mvMatrix = glMatrix.mat4.create();
+const mvpMatrix = glMatrix.mat4.create();
+
+
+
 //translate scale and rotate will occours reverse
-glMatrix.mat4.translate(matrix, matrix, [0.0, 0.2, 0.1]);
-glMatrix.mat4.scale(matrix, matrix, [0.7, 0.7, 0.7]);
+// glMatrix.mat4.translate(matrix, matrix, [0.0, 0.2, -1.9]);
+glMatrix.mat4.translate(modelMatrix, modelMatrix, [0, 0, -2])
+glMatrix.mat4.translate(viewMatrix, viewMatrix, [-1, 0, -1]);
+glMatrix.mat4.invert(viewMatrix, viewMatrix);
+glMatrix.mat4.rotateZ(modelMatrix, modelMatrix, (Math.PI / 180) * 45);
+glMatrix.mat4.rotateY(modelMatrix, modelMatrix, (Math.PI / 180) * 0.45);
+let scaleFactor = 1;
+let angle = 30;
+glMatrix.mat4.scale(modelMatrix, modelMatrix, [scaleFactor, scaleFactor, scaleFactor]);
 function animate() {
-    glMatrix.mat4.rotateZ(matrix, matrix, (Math.PI / 2) / 70);
-    glMatrix.mat4.rotateX(matrix, matrix, (Math.PI / 2) / 70);
-    gl.uniformMatrix4fv(uniformLocations.matrix, false, matrix);
+    requestAnimationFrame(animate)
+    glMatrix.mat4.rotateX(modelMatrix, modelMatrix, (Math.PI / 2) / 100);
+
+    // projectionmatrix * modelmatrix
+
+    glMatrix.mat4.multiply(mvMatrix, viewMatrix, modelMatrix);
+    glMatrix.mat4.multiply(mvpMatrix, projectionMatrix, mvMatrix);
+    gl.uniformMatrix4fv(uniformLocations.matrix, false, mvpMatrix);
     // draw arrays
     gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 3);
-    requestAnimationFrame(animate)
 }
 animate();
 
